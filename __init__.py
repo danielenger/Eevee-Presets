@@ -16,11 +16,11 @@
 
 bl_info = {
     "name": "Eevee Presets",
-    "description": "Add an Image Plane at every (selected) Image Empty",
+    "description": "Save Eevee Presets",
     "author": "Daniel Engler",
     "version": (0, 0, 1),
     "blender": (2, 80, 0),
-    "location": "View3D > Tools > Toolbar",
+    "location": "Properties > Render",
     "category": "Object"
 }
 
