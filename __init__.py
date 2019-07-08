@@ -18,10 +18,10 @@ bl_info = {
     "name": "Eevee Presets",
     "description": "Save Eevee Presets",
     "author": "Daniel Engler",
-    "version": (0, 0, 1),
+    "version": (0, 0, 2),
     "blender": (2, 80, 0),
     "location": "Properties > Render",
-    "category": "Object"
+    "category": "Render"
 }
 
 import bpy
@@ -30,8 +30,8 @@ from .eevee_presets import *
 
 classes = (
     EEVEEPRESETS_PT_panel,
-    EEVEEPRESETS_AddPresetObjectDisplay,
-    EEVEEPRESETS_MT_display_presets,
+    EEVEEPRESETS_OT_AddPreset,
+    EEVEEPRESETS_MT_DisplayPresets,
 )
 
 def register():

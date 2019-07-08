@@ -7,23 +7,22 @@ from bpy.types import Menu, Operator, Panel
 PRESET_SUBDIR = "eevee_presets"
 
 
-class EEVEEPRESETS_MT_display_presets(Menu):
+class EEVEEPRESETS_MT_DisplayPresets(Menu):
     bl_label = "Eevee Presets"
     preset_subdir = PRESET_SUBDIR
     preset_operator = "script.execute_preset"
     draw = Menu.draw_preset
 
 
-class EEVEEPRESETS_AddPresetObjectDisplay(AddPresetBase, Operator):
+class EEVEEPRESETS_OT_AddPreset(AddPresetBase, Operator):
     bl_idname = "eeveepresets.preset_add"
     bl_label = "Add Eevee Preset"
-    preset_menu = "EEVEEPRESETS_MT_display_presets"
+    preset_menu = "EEVEEPRESETS_MT_DisplayPresets"
 
-    # variable used for all preset values
-    preset_defines = ["eevee = bpy.context.scene.eevee"]
+    preset_defines = ["eevee = bpy.context.scene.eevee", "render = bpy.context.scene.render"]
 
-    # properties to store in the preset
     preset_values = [
+        "render.film_transparent",
         "eevee.bloom_clamp",
         "eevee.bloom_color",
         "eevee.bloom_intensity",
@@ -87,7 +86,6 @@ class EEVEEPRESETS_AddPresetObjectDisplay(AddPresetBase, Operator):
         "eevee.volumetric_tile_size"
     ]
 
-    # where to store the preset
     preset_subdir = PRESET_SUBDIR
 
 
@@ -98,11 +96,17 @@ class EEVEEPRESETS_PT_panel(Panel):
     bl_label = "Eevee Presets"
     bl_category = "Eevee Presets"
 
+    @classmethod
+    def poll(cls, context):
+        if context.scene.render.engine == 'BLENDER_EEVEE':
+            return True
+
     def draw(self, context):
+        # if bpy.context.scene.render.engine == 'BLENDER_EEVEE':
         row = self.layout.row(align=True)
-        row.menu(EEVEEPRESETS_MT_display_presets.__name__,
-                 text=EEVEEPRESETS_MT_display_presets.bl_label)
-        row.operator(EEVEEPRESETS_AddPresetObjectDisplay.bl_idname,
-                     text="", icon='ZOOM_IN')
-        row.operator(EEVEEPRESETS_AddPresetObjectDisplay.bl_idname,
-                     text="", icon='ZOOM_OUT').remove_active = True
+        row.menu(EEVEEPRESETS_MT_DisplayPresets.__name__,
+                text=EEVEEPRESETS_MT_DisplayPresets.bl_label)
+        row.operator(EEVEEPRESETS_OT_AddPreset.bl_idname,
+                    text="", icon='ADD')
+        row.operator(EEVEEPRESETS_OT_AddPreset.bl_idname,
+                    text="", icon='REMOVE').remove_active = True
