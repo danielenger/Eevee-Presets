@@ -1,4 +1,3 @@
-
 import bpy
 from bl_operators.presets import AddPresetBase
 from bpy.types import Menu, Operator, Panel
@@ -19,7 +18,8 @@ class EEVEEPRESETS_OT_AddPreset(AddPresetBase, Operator):
     bl_label = "Add Eevee Preset"
     preset_menu = "EEVEEPRESETS_MT_DisplayPresets"
 
-    preset_defines = ["eevee = bpy.context.scene.eevee", "render = bpy.context.scene.render"]
+    preset_defines = ["eevee = bpy.context.scene.eevee",
+                      "render = bpy.context.scene.render"]
 
     preset_values = [
         "render.film_transparent",
@@ -86,6 +86,16 @@ class EEVEEPRESETS_OT_AddPreset(AddPresetBase, Operator):
         "eevee.volumetric_tile_size"
     ]
 
+    # quick workaround for blender 2.81 alpha
+    # TODO proper code for 2.81
+    if bpy.app.version[1] == 81:
+        to_remove = ["eevee.shadow_method", "eevee.use_sss_separate_albedo"]
+        for item in to_remove:
+            try:
+                preset_values.remove(item)
+            except ValueError:
+                pass
+
     preset_subdir = PRESET_SUBDIR
 
 
@@ -105,8 +115,8 @@ class EEVEEPRESETS_PT_panel(Panel):
         # if bpy.context.scene.render.engine == 'BLENDER_EEVEE':
         row = self.layout.row(align=True)
         row.menu(EEVEEPRESETS_MT_DisplayPresets.__name__,
-                text=EEVEEPRESETS_MT_DisplayPresets.bl_label)
+                 text=EEVEEPRESETS_MT_DisplayPresets.bl_label)
         row.operator(EEVEEPRESETS_OT_AddPreset.bl_idname,
-                    text="", icon='ADD')
+                     text="", icon='ADD')
         row.operator(EEVEEPRESETS_OT_AddPreset.bl_idname,
-                    text="", icon='REMOVE').remove_active = True
+                     text="", icon='REMOVE').remove_active = True

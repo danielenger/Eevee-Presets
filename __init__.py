@@ -18,7 +18,7 @@ bl_info = {
     "name": "Eevee Presets",
     "description": "Save Eevee Presets",
     "author": "Daniel Engler",
-    "version": (0, 0, 2),
+    "version": (0, 0, 3),
     "blender": (2, 80, 0),
     "location": "Properties > Render",
     "category": "Render"
@@ -35,14 +35,14 @@ classes = (
 )
 
 def register():
-   for cls in classes:
-      bpy.utils.register_class(cls)
+    for cls in classes:
+        bpy.utils.register_class(cls)
 
-    
+
 def unregister():
-   for cls in reversed(classes):
-      bpy.utils.unregister_class(cls)
+    for cls in reversed(classes):
+        bpy.utils.unregister_class(cls)
 
 
 if __name__ == "__main__":
-   register()
+    register()
