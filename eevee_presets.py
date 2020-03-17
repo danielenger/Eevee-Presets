@@ -52,7 +52,7 @@ class EEVEEPRESETS_OT_AddPreset(AddPresetBase, Operator):
         "eevee.overscan_size",
         "eevee.shadow_cascade_size",
         "eevee.shadow_cube_size",
-        "eevee.shadow_method",
+        # "eevee.shadow_method", # removed
         "eevee.ssr_border_fade",
         "eevee.ssr_firefly_fac",
         "eevee.ssr_max_roughness",
@@ -73,7 +73,7 @@ class EEVEEPRESETS_OT_AddPreset(AddPresetBase, Operator):
         "eevee.use_ssr",
         "eevee.use_ssr_halfres",
         "eevee.use_ssr_refraction",
-        "eevee.use_sss_separate_albedo",
+        # "eevee.use_sss_separate_albedo", # removed
         "eevee.use_taa_reprojection",
         "eevee.use_volumetric_lights",
         "eevee.use_volumetric_shadows",
@@ -85,16 +85,6 @@ class EEVEEPRESETS_OT_AddPreset(AddPresetBase, Operator):
         "eevee.volumetric_start",
         "eevee.volumetric_tile_size"
     ]
-
-    # quick workaround for blender 2.81 alpha
-    # TODO proper code for 2.81
-    if bpy.app.version[1] == 81:
-        to_remove = ["eevee.shadow_method", "eevee.use_sss_separate_albedo"]
-        for item in to_remove:
-            try:
-                preset_values.remove(item)
-            except ValueError:
-                pass
 
     preset_subdir = PRESET_SUBDIR
 
@@ -112,7 +102,6 @@ class EEVEEPRESETS_PT_panel(Panel):
             return True
 
     def draw(self, context):
-        # if bpy.context.scene.render.engine == 'BLENDER_EEVEE':
         row = self.layout.row(align=True)
         row.menu(EEVEEPRESETS_MT_DisplayPresets.__name__,
                  text=EEVEEPRESETS_MT_DisplayPresets.bl_label)

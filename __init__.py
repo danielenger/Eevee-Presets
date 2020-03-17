@@ -18,8 +18,8 @@ bl_info = {
     "name": "Eevee Presets",
     "description": "Save Eevee Presets",
     "author": "Daniel Engler",
-    "version": (0, 0, 3),
-    "blender": (2, 80, 0),
+    "version": (0, 0, 4),
+    "blender": (2, 82, 0),
     "location": "Properties > Render",
     "category": "Render"
 }
