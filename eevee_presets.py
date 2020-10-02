@@ -3,14 +3,13 @@ from pathlib import Path
 
 import bpy
 from bl_operators.presets import AddPresetBase
-from bpy.props import StringProperty
+from bpy.props import BoolProperty, StringProperty
 from bpy.types import Menu, Operator, Panel
 from mathutils import Color
 
 PRESET_SUBDIR = "eevee_presets"
 EXCLUDE_LIST = ["__", "bl_rna", "gi_cache_info", "rna_type"]
 EEVEE_KEY_PREFIX = "eevee"
-RENDER_KEY_PREFIX = "render"
 PRESET_HEAD = """import bpy
 eevee = bpy.context.scene.eevee
 render = bpy.context.scene.render
@@ -34,10 +33,6 @@ def get_eevee_values():
     return pre_vals
 
 
-def get_render_values():
-    return {f"{RENDER_KEY_PREFIX}.film_transparent": bpy.context.scene.render.film_transparent}
-
-
 class EEVEEPRESETS_MT_DisplayPresets(Menu):
     bl_label = "Eevee Presets"
     preset_subdir = PRESET_SUBDIR
@@ -53,71 +48,6 @@ class EEVEEPRESETS_OT_AddPreset(AddPresetBase, Operator):
     preset_defines = ["eevee = bpy.context.scene.eevee",
                       "render = bpy.context.scene.render"]
 
-    preset_values = [
-        # "render.film_transparent",
-        # "eevee.bloom_clamp",
-        # "eevee.bloom_color",
-        # "eevee.bloom_intensity",
-        # "eevee.bloom_knee",
-        # "eevee.bloom_radius",
-        # "eevee.bloom_threshold",
-        # "eevee.bokeh_max_size",
-        # "eevee.bokeh_threshold",
-        # "eevee.gi_auto_bake",
-        # # "eevee.gi_cache_info", # read only!
-        # "eevee.gi_cubemap_display_size",
-        # "eevee.gi_cubemap_resolution",
-        # "eevee.gi_diffuse_bounces",
-        # "eevee.gi_filter_quality",
-        # "eevee.gi_glossy_clamp",
-        # "eevee.gi_irradiance_display_size",
-        # "eevee.gi_irradiance_smoothing",
-        # "eevee.gi_show_cubemaps",
-        # "eevee.gi_show_irradiance",
-        # "eevee.gi_visibility_resolution",
-        # "eevee.gtao_distance",
-        # "eevee.gtao_factor",
-        # "eevee.gtao_quality",
-        # "eevee.light_threshold",
-        # "eevee.motion_blur_samples",
-        # "eevee.motion_blur_shutter",
-        # "eevee.overscan_size",
-        # "eevee.shadow_cascade_size",
-        # "eevee.shadow_cube_size",
-        # # "eevee.shadow_method", # removed
-        # "eevee.ssr_border_fade",
-        # "eevee.ssr_firefly_fac",
-        # "eevee.ssr_max_roughness",
-        # "eevee.ssr_quality",
-        # "eevee.ssr_thickness",
-        # "eevee.sss_jitter_threshold",
-        # "eevee.sss_samples",
-        # "eevee.taa_render_samples",
-        # "eevee.taa_samples",
-        # "eevee.use_bloom",
-        # "eevee.use_gtao",
-        # "eevee.use_gtao_bent_normals",
-        # "eevee.use_gtao_bounce",
-        # "eevee.use_motion_blur",
-        # "eevee.use_overscan",
-        # "eevee.use_shadow_high_bitdepth",
-        # "eevee.use_soft_shadows",
-        # "eevee.use_ssr",
-        # "eevee.use_ssr_halfres",
-        # "eevee.use_ssr_refraction",
-        # # "eevee.use_sss_separate_albedo", # removed
-        # "eevee.use_taa_reprojection",
-        # "eevee.use_volumetric_lights",
-        # "eevee.use_volumetric_shadows",
-        # "eevee.volumetric_end",
-        # "eevee.volumetric_light_clamp",
-        # "eevee.volumetric_sample_distribution",
-        # "eevee.volumetric_samples",
-        # "eevee.volumetric_shadow_samples",
-        # "eevee.volumetric_start",
-        # "eevee.volumetric_tile_size"
-    ]
-
     preset_subdir = PRESET_SUBDIR
 
 
@@ -129,12 +59,17 @@ class EEVEEPRESETS_OT_AddEeveePreset(bpy.types.Operator):
                                 description="",
                                 default="")
 
+    film_transparent: BoolProperty(name="Save Film Transparent",
+                                        description="",
+                                        default=True)
+
     def invoke(self, context, event):
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
 
     def draw(self, context):
         layout = self.layout
+        layout.prop(self, "film_transparent")
         layout.prop(self, "preset_name")
 
     def execute(self, context):
@@ -142,22 +77,20 @@ class EEVEEPRESETS_OT_AddEeveePreset(bpy.types.Operator):
             self.report({'INFO'}, "Preset needs a name!")
             return {'CANCELLED'}
 
-        preset_path = Path(
-            bpy.utils.resource_path('USER')) / Path(
-                f"scripts/presets/{PRESET_SUBDIR}/{self.preset_name}.py")
+        eevee_values = {}
+        eevee_values[f"render.use_motion_blur"] = bpy.context.scene.render.use_motion_blur
+        if self.film_transparent:
+            eevee_values[f"render.film_transparent"] = bpy.context.scene.render.film_transparent
+        eevee_values.update(get_eevee_values())
 
         preset_lines = [PRESET_HEAD]
-
-        # bpy.context.scene.render.film_transparent
-        render_values = get_render_values()
-        for key, value in render_values.items():
-            line = f"{key} = {value}\n"
-            preset_lines.append(line)
-
-        eevee_values = get_eevee_values()
         for key, value in eevee_values.items():
             line = f"{key} = {value}\n"
             preset_lines.append(line)
+
+        preset_path = Path(
+            bpy.utils.resource_path('USER')) / Path(
+                f"scripts/presets/{PRESET_SUBDIR}/{self.preset_name}.py")
 
         with open(preset_path, 'w') as preset_file:
             preset_file.writelines(preset_lines)
