@@ -88,11 +88,24 @@ class EEVEEPRESETS_OT_AddEeveePreset(bpy.types.Operator):
             line = f"{key} = {value}\n"
             preset_lines.append(line)
 
-        preset_path = Path(
-            bpy.utils.resource_path('USER')) / Path(
-                f"scripts/presets/{PRESET_SUBDIR}/{self.preset_name}.py")
+        user_path = Path(bpy.utils.resource_path('USER'))
+        preset_path = user_path / Path(f"scripts/presets/{PRESET_SUBDIR}")
 
-        with open(preset_path, 'w') as preset_file:
+        try:
+            if not preset_path.exists():
+                preset_path.mkdir()
+        except PermissionError as _:
+            self.report(
+                {'ERROR'}, f"PermissionError for '{preset_path}'")
+            return {'CANCELLED'}
+        except FileNotFoundError as _:
+            self.report(
+                {'ERROR'}, f"FileNotFoundError for '{preset_path}'")
+            return {'CANCELLED'}
+
+        preset_file_path = preset_path / Path(f"{self.preset_name}.py")
+
+        with open(preset_file_path, 'w') as preset_file:
             preset_file.writelines(preset_lines)
 
         return {'FINISHED'}
